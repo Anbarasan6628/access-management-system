@@ -1,0 +1,271 @@
+<div class="detail-wrapper">
+
+  <!-- Loading -->
+  @if (isLoading) {
+    <div class="loading-center">
+      <mat-spinner diameter="48" />
+    </div>
+  }
+
+  @if (!isLoading && request) {
+
+    <!-- Page Header -->
+    <div class="page-header">
+      <div class="header-left">
+        <a routerLink="/requests" class="back-btn">
+          <mat-icon>arrow_back</mat-icon>
+        </a>
+        <div>
+          <h1>{{ request.title }}</h1>
+          <p class="breadcrumb">
+            Home / <a routerLink="/requests">Requests</a> /
+            <span>{{ request.id }}</span>
+          </p>
+        </div>
+      </div>
+      <span class="badge" [ngClass]="getStatusClass(request.status)">
+        {{ request.status }}
+      </span>
+    </div>
+
+    <!-- Error -->
+    @if (errorMessage) {
+      <div class="error-alert">
+        <mat-icon>error_outline</mat-icon>
+        {{ errorMessage }}
+      </div>
+    }
+
+    <div class="detail-grid">
+
+      <!-- Left Column -->
+      <div class="main-col">
+
+        <!-- Description Card -->
+        <div class="info-card">
+          <h3><mat-icon>description</mat-icon> Description</h3>
+          <p class="description-text">{{ request.description }}</p>
+        </div>
+
+        <!-- Details Card -->
+        <div class="info-card">
+          <h3><mat-icon>info</mat-icon> Request Details</h3>
+          <div class="details-grid">
+            <div class="detail-row">
+              <span class="detail-label">Category</span>
+              <span class="detail-value">{{ request.category }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Priority</span>
+              <span class="priority" [ngClass]="getPriorityClass(request.priority)">
+                {{ request.priority }}
+              </span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Status</span>
+              <span class="badge" [ngClass]="getStatusClass(request.status)">
+                {{ request.status }}
+              </span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Assigned Reviewer</span>
+              <span class="detail-value">{{ request.assignedReviewerName || '—' }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Created By</span>
+              <span class="detail-value">{{ request.createdByName }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Created Date</span>
+              <span class="detail-value">
+                {{ request.createdDate | date:'dd MMM yyyy, hh:mm a' }}
+              </span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Last Updated</span>
+              <span class="detail-value">
+                {{ request.updatedDate | date:'dd MMM yyyy, hh:mm a' }}
+              </span>
+            </div>
+            @if (request.attachmentUrl) {
+              <div class="detail-row">
+                <span class="detail-label">Attachment</span>
+                <a [href]="request.attachmentUrl" target="_blank" class="attachment-link">
+                  <mat-icon>attach_file</mat-icon>
+                  Download File
+                </a>
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Actions Card -->
+        <div class="info-card actions-card">
+          <h3><mat-icon>bolt</mat-icon> Actions</h3>
+          <div class="action-buttons">
+
+            @if (canEdit) {
+              <a [routerLink]="['/requests', request.id, 'edit']"
+                class="action-btn submit">
+                <mat-icon>edit</mat-icon>
+                Edit Request
+              </a>
+            }
+
+            @if (canSubmit) {
+              <button class="action-btn submit"
+                (click)="submit()"
+                [disabled]="actionLoading">
+                <mat-icon>send</mat-icon>
+                Submit for Review
+              </button>
+            }
+
+            @if (canStartReview) {
+              <button class="action-btn review"
+                (click)="startReview()"
+                [disabled]="actionLoading">
+                <mat-icon>rate_review</mat-icon>
+                Start Review
+              </button>
+            }
+
+            @if (canApprove) {
+              <button class="action-btn approve"
+                (click)="approve()"
+                [disabled]="actionLoading">
+                <mat-icon>check_circle</mat-icon>
+                Approve
+              </button>
+            }
+
+            @if (canReject) {
+              <button class="action-btn reject"
+                (click)="openRejectDialog()"
+                [disabled]="actionLoading">
+                <mat-icon>cancel</mat-icon>
+                Reject
+              </button>
+            }
+
+            @if (canSendBack) {
+              <button class="action-btn sendback"
+                (click)="sendBack()"
+                [disabled]="actionLoading">
+                <mat-icon>undo</mat-icon>
+                Send Back
+              </button>
+            }
+
+            @if (canProvision) {
+              <button class="action-btn provision"
+                (click)="provision()"
+                [disabled]="actionLoading">
+                <mat-icon>settings</mat-icon>
+                Start Provisioning
+              </button>
+            }
+
+            @if (canClose) {
+              <button class="action-btn close-req"
+                (click)="close()"
+                [disabled]="actionLoading">
+                <mat-icon>lock</mat-icon>
+                Close Request
+              </button>
+            }
+
+            @if (actionLoading) {
+              <mat-spinner diameter="24" />
+            }
+
+            @if (!canEdit && !canSubmit && !canStartReview &&
+                 !canApprove && !canReject && !canSendBack &&
+                 !canProvision && !canClose) {
+              <p class="no-actions">
+                <mat-icon>info</mat-icon>
+                No actions available for current status
+              </p>
+            }
+
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Right Column — Audit Timeline -->
+      <div class="audit-col">
+        <div class="info-card audit-card">
+          <h3><mat-icon>history</mat-icon> Audit Timeline</h3>
+
+          @if (auditLogs.length === 0) {
+            <div class="empty-audit">
+              <mat-icon>history_toggle_off</mat-icon>
+              <p>No audit history yet</p>
+            </div>
+          }
+
+          <div class="timeline">
+            @for (log of auditLogs; track log.id) {
+              <div class="timeline-item">
+                <div class="timeline-dot"
+                  [ngClass]="getStatusClass(log.newStatus)">
+                </div>
+                <div class="timeline-content">
+                  <p class="timeline-action">{{ log.action }}</p>
+                  <p class="timeline-meta">
+                    <span>{{ log.changedByName }}</span>
+                    <span>{{ getTimeAgo(log.createdDate) }}</span>
+                  </p>
+                  <div class="timeline-status">
+                    <span class="badge" [ngClass]="getStatusClass(log.oldStatus)">
+                      {{ log.oldStatus }}
+                    </span>
+                    <mat-icon>arrow_forward</mat-icon>
+                    <span class="badge" [ngClass]="getStatusClass(log.newStatus)">
+                      {{ log.newStatus }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+
+    </div>
+  }
+
+  <!-- Reject Dialog -->
+  @if (showRejectDialog) {
+    <div class="dialog-overlay" (click)="showRejectDialog = false">
+      <div class="dialog-box" (click)="$event.stopPropagation()">
+        <div class="dialog-header">
+          <h3><mat-icon style="color:#E74C3C">cancel</mat-icon> Reject Request</h3>
+          <button class="close-btn" type="button" (click)="showRejectDialog = false">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+        <p class="reject-msg">Please provide a reason for rejection:</p>
+        <textarea
+          class="reject-textarea"
+          [(ngModel)]="rejectReason"
+          placeholder="Enter rejection reason..."
+          rows="4">
+        </textarea>
+        <div class="dialog-actions">
+          <button class="action-btn sendback" (click)="showRejectDialog = false">
+            Cancel
+          </button>
+          <button class="action-btn reject"
+            [disabled]="!rejectReason.trim()"
+            (click)="confirmReject()">
+            <mat-icon>cancel</mat-icon>
+            Confirm Reject
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+</div>

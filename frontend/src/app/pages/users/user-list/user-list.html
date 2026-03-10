@@ -1,0 +1,334 @@
+<div class="user-list-wrapper">
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <div>
+      <h1>User Management</h1>
+      <p class="breadcrumb">Home / <span>Users</span></p>
+    </div>
+    <button class="btn-primary-custom" (click)="openCreate()">
+      <mat-icon>person_add</mat-icon>
+      Add User
+    </button>
+  </div>
+
+  <!-- Success Message -->
+  @if (successMessage) {
+    <div class="success-alert">
+      <mat-icon>check_circle</mat-icon>
+      {{ successMessage }}
+    </div>
+  }
+
+  <!-- Error Message -->
+  @if (errorMessage) {
+    <div class="error-alert">
+      <mat-icon>error_outline</mat-icon>
+      {{ errorMessage }}
+    </div>
+  }
+
+  <!-- Filters -->
+  <div class="filters-card">
+    <div class="filter-group search-group">
+      <mat-icon class="filter-icon">search</mat-icon>
+      <input class="filter-input" [(ngModel)]="searchText"
+        placeholder="Search by name, ID or email..."/>
+    </div>
+
+    <div class="filter-group">
+      <app-dropdown
+        [(ngModel)]="filterRole"
+        [options]="roleFilterOptions"
+        placeholder="All Roles"
+        icon="admin_panel_settings">
+      </app-dropdown>
+    </div>
+
+    <button class="clear-filter-btn" (click)="searchText=''; filterRole=''">
+      <mat-icon>close</mat-icon>
+      Clear
+    </button>
+  </div>
+
+  <!-- Stats Row -->
+  <div class="stats-row">
+    <div class="stat-pill">
+      <mat-icon>people</mat-icon>
+      <span>Total: <b>{{ users.length }}</b></span>
+    </div>
+    <div class="stat-pill admin">
+      <mat-icon>admin_panel_settings</mat-icon>
+      <span>Admins: <b>{{ users | roleCount:'Admin' }}</b></span>
+    </div>
+    <div class="stat-pill reviewer">
+      <mat-icon>rate_review</mat-icon>
+      <span>Reviewers: <b>{{ users | roleCount:'Reviewer' }}</b></span>
+    </div>
+    <div class="stat-pill employee">
+      <mat-icon>person</mat-icon>
+      <span>Employees: <b>{{ users | roleCount:'Employee' }}</b></span>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  @if (isLoading) {
+    <div class="loading-center">
+      <mat-spinner diameter="40"/>
+      <p>Loading users...</p>
+    </div>
+  }
+
+  @if (!isLoading) {
+
+    <!-- Desktop Table -->
+    <div class="table-card desktop-only">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Employee ID</th>
+            <th>Full Name</th>
+            <th>Email</th>
+            <th>Department</th>
+            <th>Role</th>
+            <th>Created</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (filteredUsers.length === 0) {
+            <tr>
+              <td colspan="8" class="empty-row">
+                <mat-icon>people_outline</mat-icon>
+                <p>No users found</p>
+              </td>
+            </tr>
+          }
+          @for (user of filteredUsers; track user.id) {
+            <tr>
+              <td class="id-col">{{ user.id }}</td>
+              <td><span class="emp-id">{{ user.employeeId }}</span></td>
+              <td>
+                <div class="user-info">
+                  <div class="avatar" [ngClass]="getRoleClass(user.role)">
+                    {{ user.fullName.charAt(0) }}
+                  </div>
+                  <span>{{ user.fullName }}</span>
+                </div>
+              </td>
+              <td class="email-col">{{ user.email }}</td>
+              <td>{{ user.department }}</td>
+              <td>
+                <span class="role-badge" [ngClass]="getRoleClass(user.role)">
+                  {{ user.role }}
+                </span>
+              </td>
+              <td>{{ user.createdDate | date:'dd MMM yyyy' }}</td>
+              <td class="actions-col">
+                <a class="icon-btn edit" (click)="openEdit(user)">
+                  <mat-icon>edit</mat-icon>
+                </a>
+                <a class="icon-btn delete" (click)="openDeleteConfirm(user)">
+                  <mat-icon>delete</mat-icon>
+                </a>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Mobile Cards -->
+    <div class="mobile-cards mobile-only">
+      @for (user of filteredUsers; track user.id) {
+        <div class="user-card">
+          <div class="card-top">
+            <div class="avatar" [ngClass]="getRoleClass(user.role)">
+              {{ user.fullName.charAt(0) }}
+            </div>
+            <div class="card-info">
+              <h3>{{ user.fullName }}</h3>
+              <p>{{ user.employeeId }} • {{ user.department }}</p>
+            </div>
+            <span class="role-badge" [ngClass]="getRoleClass(user.role)">
+              {{ user.role }}
+            </span>
+          </div>
+          <p class="card-email">{{ user.email }}</p>
+          <div class="card-actions">
+            <button mat-stroked-button (click)="openEdit(user)">
+              <mat-icon>edit</mat-icon> Edit
+            </button>
+            <button mat-stroked-button class="delete-outline"
+              (click)="openDeleteConfirm(user)">
+              <mat-icon>delete</mat-icon> Delete
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Create/Edit Dialog -->
+  @if (showDialog) {
+    <div class="dialog-overlay" (click)="closeDialog()">
+      <div class="dialog-box" (click)="$event.stopPropagation()">
+
+        <div class="dialog-header">
+          <h3>
+            <mat-icon>{{ isEditMode ? 'edit' : 'person_add' }}</mat-icon>
+            {{ isEditMode ? 'Edit User' : 'Create New User' }}
+          </h3>
+          <button class="close-btn" type="button" (click)="closeDialog()">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+
+        @if (errorMessage) {
+          <div class="error-alert">
+            <mat-icon>error_outline</mat-icon>
+            {{ errorMessage }}
+          </div>
+        }
+
+        <form [formGroup]="form" (ngSubmit)="onSubmit()">
+          <div class="dialog-grid">
+
+            <!-- Employee ID -->
+            <div class="form-group">
+              <label>Employee ID <span class="req">*</span></label>
+              <div class="input-wrap" [class.error]="employeeId.invalid && employeeId.touched">
+                <mat-icon>badge</mat-icon>
+                <input formControlName="employeeId" placeholder="e.g. EMP002"/>
+              </div>
+              @if (employeeId.invalid && employeeId.touched) {
+                <span class="err-msg">Employee ID is required</span>
+              }
+            </div>
+
+            <!-- Full Name -->
+            <div class="form-group">
+              <label>Full Name <span class="req">*</span></label>
+              <div class="input-wrap" [class.error]="fullName.invalid && fullName.touched">
+                <mat-icon>person</mat-icon>
+                <input formControlName="fullName" placeholder="Enter full name"/>
+              </div>
+              @if (fullName.invalid && fullName.touched) {
+                <span class="err-msg">Full name is required</span>
+              }
+            </div>
+
+            <!-- Email -->
+            <div class="form-group full-width">
+              <label>Email <span class="req">*</span></label>
+              <div class="input-wrap" [class.error]="email.invalid && email.touched">
+                <mat-icon>email</mat-icon>
+                <input formControlName="email"
+                  placeholder="Enter email address" type="email"/>
+              </div>
+              @if (email.hasError('required') && email.touched) {
+                <span class="err-msg">Email is required</span>
+              }
+              @if (email.hasError('email') && email.touched) {
+                <span class="err-msg">Invalid email format</span>
+              }
+            </div>
+
+            <!-- Password -->
+            <div class="form-group">
+              <label>
+                Password
+                @if (!isEditMode) { <span class="req">*</span> }
+                @if (isEditMode)  { <span class="optional">(leave blank to keep)</span> }
+              </label>
+              <div class="input-wrap" [class.error]="password.invalid && password.touched">
+                <mat-icon>lock</mat-icon>
+                <input formControlName="password" type="password"
+                  placeholder="{{ isEditMode ? 'Leave blank to keep' : 'Enter password' }}"/>
+              </div>
+              @if (password.invalid && password.touched) {
+                <span class="err-msg">Password is required</span>
+              }
+            </div>
+
+            <!-- Role -->
+            <div class="form-group">
+              <label>Role <span class="req">*</span></label>
+              <app-dropdown
+                formControlName="role"
+                [options]="roles"
+                placeholder="Select role"
+                icon="admin_panel_settings">
+              </app-dropdown>
+              @if (role.invalid && role.touched) {
+                <span class="err-msg">Role is required</span>
+              }
+            </div>
+
+            <!-- Department -->
+            <div class="form-group full-width">
+              <label>Department <span class="req">*</span></label>
+              <app-dropdown
+                formControlName="department"
+                [options]="departmentOptions"
+                placeholder="Select department"
+                icon="business">
+              </app-dropdown>
+              @if (department.invalid && department.touched) {
+                <span class="err-msg">Department is required</span>
+              }
+            </div>
+
+          </div>
+
+          <!-- Dialog Actions -->
+          <div class="dialog-actions">
+            <button type="button" mat-stroked-button (click)="closeDialog()">
+              Cancel
+            </button>
+            <button type="submit" class="btn-primary-custom"
+              [disabled]="form.invalid || isSaving">
+              @if (isSaving) {
+                <mat-spinner diameter="18"/>
+                <span>Saving...</span>
+              } @else {
+                <mat-icon>save</mat-icon>
+                <span>{{ isEditMode ? 'Update User' : 'Create User' }}</span>
+              }
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+
+  <!-- Delete Confirm Dialog -->
+  @if (showDeleteConfirm) {
+    <div class="dialog-overlay" (click)="showDeleteConfirm = false">
+      <div class="dialog-box small-dialog" (click)="$event.stopPropagation()">
+        <div class="dialog-header">
+          <h3><mat-icon style="color:#E74C3C">warning</mat-icon> Delete User</h3>
+          <button class="close-btn" type="button" (click)="showDeleteConfirm = false">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+        <p class="delete-msg">
+          Are you sure you want to delete
+          <b>{{ deletingName }}</b>?
+          This action cannot be undone.
+        </p>
+        <div class="dialog-actions">
+          <button mat-stroked-button (click)="showDeleteConfirm = false">
+            Cancel
+          </button>
+          <button class="delete-confirm-btn" (click)="confirmDelete()">
+            <mat-icon>delete</mat-icon>
+            Delete User
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+</div>

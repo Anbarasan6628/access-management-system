@@ -1,0 +1,211 @@
+<div class="request-list-wrapper">
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <div>
+      <h1>
+        @if (isAdmin()) { All Requests }
+        @else if (isReviewer()) { Review Requests }
+        @else { My Requests }
+      </h1>
+      <p class="breadcrumb">Home / <span>Requests</span></p>
+    </div>
+    <button mat-raised-button class="btn-primary" routerLink="/requests/create">
+      <mat-icon>add</mat-icon>
+      New Request
+    </button>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-card">
+
+    <!-- Search -->
+    <div class="filter-group search-group">
+      <mat-icon class="filter-icon">search</mat-icon>
+      <input class="filter-input"
+        [(ngModel)]="searchText"
+        placeholder="Search requests..."/>
+    </div>
+
+    <!-- Status -->
+    <div class="filter-group">
+      <app-dropdown
+        [(ngModel)]="filterStatus"
+        [options]="statusOptions"
+        placeholder="All Status"
+        icon="flag">
+      </app-dropdown>
+    </div>
+
+    <!-- Priority -->
+    <div class="filter-group">
+      <app-dropdown
+        [(ngModel)]="filterPriority"
+        [options]="priorityOptions"
+        placeholder="All Priority"
+        icon="priority_high">
+      </app-dropdown>
+    </div>
+
+    <!-- Category -->
+    <div class="filter-group">
+      <app-dropdown
+        [(ngModel)]="filterCategory"
+        [options]="categoryOptions"
+        placeholder="All Category"
+        icon="category">
+      </app-dropdown>
+    </div>
+
+    <!-- Clear -->
+    <button class="clear-filter-btn"
+      (click)="searchText=''; filterStatus=''; filterPriority=''; filterCategory=''">
+      <mat-icon>close</mat-icon>
+      Clear
+    </button>
+
+  </div>
+
+  <!-- Loading -->
+  @if (isLoading) {
+    <div class="loading-center">
+      <mat-spinner diameter="40" />
+      <p>Loading requests...</p>
+    </div>
+  }
+
+  @if (!isLoading) {
+
+    <!-- Desktop Table -->
+    <div class="table-card desktop-table">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Title</th>
+            <th>Category</th>
+            <th>Priority</th>
+            <th>Status</th>
+            <th>Reviewer</th>
+            <th>Created</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (filteredItems.length === 0) {
+            <tr>
+              <td colspan="8" class="empty-row">
+                <mat-icon>inbox</mat-icon>
+                <p>No requests found</p>
+              </td>
+            </tr>
+          }
+          @for (req of filteredItems; track req.id) {
+            <tr>
+              <td class="id-col">{{ req.id }}</td>
+              <td class="title-col">
+                <span class="title-text">{{ req.title }}</span>
+                <span class="created-by">{{ req.createdByName }}</span>
+              </td>
+              <td>{{ req.category }}</td>
+              <td>
+                <span class="priority" [ngClass]="getPriorityClass(req.priority)">
+                  <mat-icon>{{ getPriorityIcon(req.priority) }}</mat-icon>
+                  {{ req.priority }}
+                </span>
+              </td>
+              <td>
+                <span class="badge" [ngClass]="getStatusClass(req.status)">
+                  {{ req.status }}
+                </span>
+              </td>
+              <td>{{ req.assignedReviewerName || '—' }}</td>
+              <td>{{ req.createdDate | date:'dd MMM yyyy' }}</td>
+              <td class="actions-col">
+                <a [routerLink]="['/requests', req.id]"
+                  class="icon-btn view">
+                  <mat-icon>visibility</mat-icon>
+                </a>
+                @if (canEdit(req)) {
+                  <a [routerLink]="['/requests', req.id, 'edit']"
+                    class="icon-btn edit">
+                    <mat-icon>edit</mat-icon>
+                  </a>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Mobile Cards -->
+    <div class="mobile-cards">
+      @if (filteredItems.length === 0) {
+        <div class="empty-state">
+          <mat-icon>inbox</mat-icon>
+          <p>No requests found</p>
+        </div>
+      }
+      @for (req of filteredItems; track req.id) {
+        <div class="request-card">
+          <div class="card-top">
+            <span class="badge" [ngClass]="getStatusClass(req.status)">
+              {{ req.status }}
+            </span>
+            <span class="priority" [ngClass]="getPriorityClass(req.priority)">
+              <mat-icon>{{ getPriorityIcon(req.priority) }}</mat-icon>
+              {{ req.priority }}
+            </span>
+          </div>
+          <h3>{{ req.title }}</h3>
+          <p class="card-meta">
+            {{ req.category }} • {{ req.createdDate | date:'dd MMM yyyy' }}
+          </p>
+          <div class="card-actions">
+            <button mat-stroked-button [routerLink]="['/requests', req.id]">
+              <mat-icon>visibility</mat-icon> View
+            </button>
+            @if (canEdit(req)) {
+              <button mat-stroked-button [routerLink]="['/requests', req.id, 'edit']">
+                <mat-icon>edit</mat-icon> Edit
+              </button>
+            }
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Pagination -->
+    @if (result && result.totalPages > 1) {
+      <div class="pagination">
+        <span class="pagination-info">
+          Showing {{ (pageNumber-1) * pageSize + 1 }}–
+          {{ pageNumber * pageSize > result.totalCount ? result.totalCount : pageNumber * pageSize }}
+          of {{ result.totalCount }}
+        </span>
+        <div class="pagination-controls">
+          <button mat-icon-button
+            [disabled]="!result.hasPreviousPage"
+            (click)="onPageChange(pageNumber - 1)">
+            <mat-icon>chevron_left</mat-icon>
+          </button>
+          @for (page of pages; track page) {
+            <button
+              class="page-btn"
+              [class.active]="page === pageNumber"
+              (click)="onPageChange(page)">
+              {{ page }}
+            </button>
+          }
+          <button mat-icon-button
+            [disabled]="!result.hasNextPage"
+            (click)="onPageChange(pageNumber + 1)">
+            <mat-icon>chevron_right</mat-icon>
+          </button>
+        </div>
+      </div>
+    }
+  }
+
+</div>

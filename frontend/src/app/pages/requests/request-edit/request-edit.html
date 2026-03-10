@@ -1,0 +1,189 @@
+<div class="edit-wrapper">
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <div>
+      <h1>Edit Request</h1>
+      <p class="breadcrumb">
+        Home /
+        <a routerLink="/requests">Requests</a> /
+        <a [routerLink]="['/requests', requestId]">{{ requestId }}</a> /
+        <span>Edit</span>
+      </p>
+    </div>
+    <a class="btn-back" [routerLink]="['/requests', requestId]">
+      <mat-icon>arrow_back</mat-icon>
+      Back to Detail
+    </a>
+  </div>
+
+  <!-- Loading -->
+  @if (isLoading) {
+    <div class="loading-center">
+      <mat-spinner diameter="40"/>
+      <p>Loading request...</p>
+    </div>
+  }
+
+  @if (!isLoading) {
+    <div class="form-card">
+
+      <div class="form-header">
+        <mat-icon>edit</mat-icon>
+        <div>
+          <h2>Edit Change Request</h2>
+          <p>Update the details below — only Draft requests can be edited</p>
+        </div>
+      </div>
+
+      @if (errorMessage) {
+        <div class="error-alert">
+          <mat-icon>error_outline</mat-icon>
+          {{ errorMessage }}
+        </div>
+      }
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+
+        <!-- Title -->
+        <div class="form-group">
+          <label>Title <span class="required">*</span></label>
+          <div class="input-wrap">
+            <mat-icon class="input-icon">title</mat-icon>
+            <input class="custom-input" formControlName="title"
+              placeholder="Enter a clear title"/>
+          </div>
+          @if (title.hasError('required') && title.touched) {
+            <span class="error-msg">Title is required</span>
+          }
+          @if (title.hasError('minlength') && title.touched) {
+            <span class="error-msg">Minimum 5 characters required</span>
+          }
+        </div>
+
+        <!-- Description -->
+        <div class="form-group">
+          <label>Description <span class="required">*</span></label>
+          <div class="input-wrap">
+            <mat-icon class="input-icon top-icon">description</mat-icon>
+            <textarea class="custom-input custom-textarea"
+              formControlName="description"
+              placeholder="Describe the change request"
+              rows="4">
+            </textarea>
+          </div>
+          @if (description.hasError('required') && description.touched) {
+            <span class="error-msg">Description is required</span>
+          }
+          @if (description.hasError('minlength') && description.touched) {
+            <span class="error-msg">Minimum 10 characters required</span>
+          }
+        </div>
+
+        <!-- Category + Priority -->
+        <div class="two-col-row">
+
+          <div class="form-group">
+            <label>Category <span class="required">*</span></label>
+            <app-dropdown
+              formControlName="category"
+              [options]="categories"
+              placeholder="Select category"
+              icon="category">
+            </app-dropdown>
+            @if (category.hasError('required') && category.touched) {
+              <span class="error-msg">Category is required</span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label>Priority <span class="required">*</span></label>
+            <app-dropdown
+              formControlName="priority"
+              [options]="priorities"
+              placeholder="Select priority"
+              icon="flag">
+            </app-dropdown>
+            @if (priority.hasError('required') && priority.touched) {
+              <span class="error-msg">Priority is required</span>
+            }
+          </div>
+
+        </div>
+
+        <!-- Assign Reviewer -->
+        <div class="form-group">
+          <label>Assign Reviewer <span class="required">*</span></label>
+          <app-dropdown
+            formControlName="assignedReviewerId"
+            [options]="reviewerOptions"
+            placeholder="Select a reviewer"
+            icon="person">
+          </app-dropdown>
+          @if (assignedReviewerId.hasError('required') && assignedReviewerId.touched) {
+            <span class="error-msg">Please assign a reviewer</span>
+          }
+        </div>
+
+        <!-- File Upload -->
+        <div class="form-group">
+          <label>
+            Attachment
+            <span class="optional">(Optional)</span>
+          </label>
+
+          @if (existingFile && !selectedFile) {
+            <div class="existing-file">
+              <mat-icon>attach_file</mat-icon>
+              <span>Current: {{ existingFile }}</span>
+              <button class="btn-change-file" type="button"
+                (click)="existingFile = ''">
+                Change File
+              </button>
+            </div>
+          }
+
+          @if (!existingFile && !selectedFile) {
+            <label for="fileInput" class="file-drop-zone">
+              <mat-icon>cloud_upload</mat-icon>
+              <p>Click to upload or drag and drop</p>
+              <span>PDF, DOC, DOCX, PNG, JPG — Max 5MB</span>
+              <input id="fileInput" type="file" hidden
+                (change)="onFileSelected($event)"
+                accept=".pdf,.doc,.docx,.png,.jpg,.jpeg"/>
+            </label>
+          }
+
+          @if (selectedFile) {
+            <div class="file-selected">
+              <mat-icon>attach_file</mat-icon>
+              <span>{{ fileName }}</span>
+              <button class="close-btn" type="button" (click)="removeFile()">
+                <mat-icon>close</mat-icon>
+              </button>
+            </div>
+          }
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+          <button class="btn-cancel" type="button"
+            [routerLink]="['/requests', requestId]">
+            Cancel
+          </button>
+          <button class="btn-save" type="submit"
+            [disabled]="form.invalid || isSaving">
+            @if (isSaving) {
+              <mat-spinner diameter="18"/>
+              <span>Saving...</span>
+            } @else {
+              <mat-icon>save</mat-icon>
+              <span>Save Changes</span>
+            }
+          </button>
+        </div>
+
+      </form>
+    </div>
+  }
+</div>

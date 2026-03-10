@@ -1,0 +1,171 @@
+<div class="dashboard-wrapper">
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <div>
+      <h1>Dashboard</h1>
+      <p class="breadcrumb">Home / <span>Dashboard</span></p>
+    </div>
+    <div class="header-right">
+      <span class="greeting">
+        Welcome back, {{ currentUser?.fullName }}! 👋
+      </span>
+      <button mat-raised-button class="btn-primary" routerLink="/requests/create">
+        <mat-icon>add</mat-icon>
+        New Request
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  @if (isLoading) {
+    <div class="loading-center">
+      <mat-spinner diameter="48" />
+      <p>Loading dashboard...</p>
+    </div>
+  }
+
+  @if (!isLoading && stats) {
+
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+      @for (card of statCards; track card.key) {
+        <div class="stat-card" [style.border-left-color]="card.color">
+          <div class="stat-icon" [style.background]="card.color + '20'">
+            <mat-icon [style.color]="card.color">{{ card.icon }}</mat-icon>
+          </div>
+          <div class="stat-info">
+            <h3>{{ getStatValue(card.key) }}</h3>
+            <p>{{ card.label }}</p>
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Bottom Section -->
+    <div class="bottom-grid">
+
+      <!-- Status Overview -->
+      <div class="card status-overview">
+        <div class="card-header">
+          <h2>
+            <mat-icon>pie_chart</mat-icon>
+            Status Overview
+          </h2>
+        </div>
+        <div class="status-list">
+          <div class="status-row">
+            <span class="badge draft">Draft</span>
+            <div class="progress-bar">
+              <div class="progress-fill"
+                [style.width.%]="stats.totalRequests ? (stats.draftCount / stats.totalRequests) * 100 : 0"
+                style="background:#95A5A6">
+              </div>
+            </div>
+            <span class="count">{{ stats.draftCount }}</span>
+          </div>
+          <div class="status-row">
+            <span class="badge submitted">Submitted</span>
+            <div class="progress-bar">
+              <div class="progress-fill"
+                [style.width.%]="stats.totalRequests ? (stats.submittedCount / stats.totalRequests) * 100 : 0"
+                style="background:#3498DB">
+              </div>
+            </div>
+            <span class="count">{{ stats.submittedCount }}</span>
+          </div>
+          <div class="status-row">
+            <span class="badge inreview">In Review</span>
+            <div class="progress-bar">
+              <div class="progress-fill"
+                [style.width.%]="stats.totalRequests ? (stats.inReviewCount / stats.totalRequests) * 100 : 0"
+                style="background:#F39C12">
+              </div>
+            </div>
+            <span class="count">{{ stats.inReviewCount }}</span>
+          </div>
+          <div class="status-row">
+            <span class="badge approved">Approved</span>
+            <div class="progress-bar">
+              <div class="progress-fill"
+                [style.width.%]="stats.totalRequests ? (stats.approvedCount / stats.totalRequests) * 100 : 0"
+                style="background:#27AE60">
+              </div>
+            </div>
+            <span class="count">{{ stats.approvedCount }}</span>
+          </div>
+          <div class="status-row">
+            <span class="badge rejected">Rejected</span>
+            <div class="progress-bar">
+              <div class="progress-fill"
+                [style.width.%]="stats.totalRequests ? (stats.rejectedCount / stats.totalRequests) * 100 : 0"
+                style="background:#E74C3C">
+              </div>
+            </div>
+            <span class="count">{{ stats.rejectedCount }}</span>
+          </div>
+          <div class="status-row">
+            <span class="badge provisioning">Provisioning</span>
+            <div class="progress-bar">
+              <div class="progress-fill"
+                [style.width.%]="stats.totalRequests ? (stats.provisioningCount / stats.totalRequests) * 100 : 0"
+                style="background:#9B59B6">
+              </div>
+            </div>
+            <span class="count">{{ stats.provisioningCount }}</span>
+          </div>
+          <div class="status-row">
+            <span class="badge closed">Closed</span>
+            <div class="progress-bar">
+              <div class="progress-fill"
+                [style.width.%]="stats.totalRequests ? (stats.closedCount / stats.totalRequests) * 100 : 0"
+                style="background:#2C3E50">
+              </div>
+            </div>
+            <span class="count">{{ stats.closedCount }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Activity -->
+      <div class="card recent-activity">
+        <div class="card-header">
+          <h2>
+            <mat-icon>history</mat-icon>
+            Recent Activity
+          </h2>
+          <button mat-button routerLink="/requests" class="view-all">
+            View All
+          </button>
+        </div>
+
+        @if (stats.recentActivity.length === 0) {
+          <div class="empty-state">
+            <mat-icon>inbox</mat-icon>
+            <p>No recent activity</p>
+          </div>
+        }
+
+        <div class="activity-list">
+          @for (activity of stats.recentActivity; track activity.requestId) {
+            <div class="activity-item">
+              <div class="activity-dot"
+                [ngClass]="getStatusClass(activity.action)">
+              </div>
+              <div class="activity-content">
+                <p class="activity-title">{{ activity.title }}</p>
+                <p class="activity-meta">
+                  {{ activity.action }} •
+                  {{ activity.changedByName }} •
+                  {{ getTimeAgo(activity.date) }}
+                </p>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+
+    </div>
+  }
+
+</div>

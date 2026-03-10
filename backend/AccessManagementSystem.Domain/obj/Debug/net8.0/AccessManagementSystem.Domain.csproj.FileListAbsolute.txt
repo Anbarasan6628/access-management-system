@@ -1,0 +1,11 @@
+C:\Users\anbar\Project\AccessManagementSystem\AccessManagementSystem\AccessManagementSystem.Domain\bin\Debug\net8.0\AccessManagementSystem.Domain.deps.json
+C:\Users\anbar\Project\AccessManagementSystem\AccessManagementSystem\AccessManagementSystem.Domain\bin\Debug\net8.0\AccessManagementSystem.Domain.dll
+C:\Users\anbar\Project\AccessManagementSystem\AccessManagementSystem\AccessManagementSystem.Domain\bin\Debug\net8.0\AccessManagementSystem.Domain.pdb
+C:\Users\anbar\Project\AccessManagementSystem\AccessManagementSystem\AccessManagementSystem.Domain\obj\Debug\net8.0\AccessManagementSystem.Domain.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\anbar\Project\AccessManagementSystem\AccessManagementSystem\AccessManagementSystem.Domain\obj\Debug\net8.0\AccessManagementSystem.Domain.AssemblyInfoInputs.cache
+C:\Users\anbar\Project\AccessManagementSystem\AccessManagementSystem\AccessManagementSystem.Domain\obj\Debug\net8.0\AccessManagementSystem.Domain.AssemblyInfo.cs
+C:\Users\anbar\Project\AccessManagementSystem\AccessManagementSystem\AccessManagementSystem.Domain\obj\Debug\net8.0\AccessManagementSystem.Domain.csproj.CoreCompileInputs.cache
+C:\Users\anbar\Project\AccessManagementSystem\AccessManagementSystem\AccessManagementSystem.Domain\obj\Debug\net8.0\AccessManagementSystem.Domain.dll
+C:\Users\anbar\Project\AccessManagementSystem\AccessManagementSystem\AccessManagementSystem.Domain\obj\Debug\net8.0\refint\AccessManagementSystem.Domain.dll
+C:\Users\anbar\Project\AccessManagementSystem\AccessManagementSystem\AccessManagementSystem.Domain\obj\Debug\net8.0\AccessManagementSystem.Domain.pdb
+C:\Users\anbar\Project\AccessManagementSystem\AccessManagementSystem\AccessManagementSystem.Domain\obj\Debug\net8.0\ref\AccessManagementSystem.Domain.dll

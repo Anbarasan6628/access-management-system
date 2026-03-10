@@ -1,0 +1,25 @@
+<header class="navbar">
+
+  <!-- Left — Toggle + Title -->
+  <div class="navbar-left">
+    <button mat-icon-button (click)="toggleSidebar.emit()" class="toggle-btn">
+      <mat-icon>menu</mat-icon>
+    </button>
+    <span class="app-title">Access Management System</span>
+  </div>
+
+  <!-- Right — User Info Only (no dropdown, no logout) -->
+  <div class="navbar-right">
+    <div class="user-info-block">
+      <div class="user-avatar">{{ userInitials }}</div>
+      <div class="user-details">
+        <span class="user-name">{{ currentUser?.fullName }}</span>
+        <span class="user-sub">
+          <span class="role-dot" [style.background]="roleColor"></span>
+          {{ currentUser?.role }} · {{ currentUser?.employeeId }}
+        </span>
+      </div>
+    </div>
+  </div>
+
+</header>

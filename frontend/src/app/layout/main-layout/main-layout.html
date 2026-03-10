@@ -1,0 +1,26 @@
+<div class="layout-wrapper" [class.sidebar-open]="isSidebarOpen()">
+
+  <!-- Sidebar -->
+  <app-sidebar
+    [isOpen]="isSidebarOpen()"
+    (closeSidebar)="isSidebarOpen.set(false)">
+  </app-sidebar>
+
+  <!-- Overlay for mobile -->
+  @if (isMobile() && isSidebarOpen()) {
+    <div class="overlay" (click)="isSidebarOpen.set(false)"></div>
+  }
+
+  <!-- Main Content -->
+  <div class="main-content">
+
+    <!-- Navbar -->
+    <app-navbar (toggleSidebar)="toggleSidebar()"></app-navbar>
+
+    <!-- Page Content -->
+    <div class="page-content">
+      <router-outlet />
+    </div>
+
+  </div>
+</div>

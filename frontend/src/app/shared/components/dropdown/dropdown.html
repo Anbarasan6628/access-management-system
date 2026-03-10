@@ -1,0 +1,39 @@
+<div class="dropdown-wrapper"
+  [class.open]="isOpen"
+  [class.has-value]="hasValue"
+  [class.disabled]="isDisabled">
+
+  <!-- Trigger -->
+  <div class="dropdown-trigger" (click)="toggle()">
+    @if (icon) {
+      <mat-icon class="trigger-icon">{{ icon }}</mat-icon>
+    }
+    <span class="trigger-label" [class.placeholder]="!hasValue">
+      {{ displayLabel }}
+    </span>
+    <div class="trigger-actions">
+      @if (hasValue) {
+        <mat-icon class="clear-icon" (click)="clear($event)">close</mat-icon>
+      }
+      <mat-icon class="arrow-icon">expand_more</mat-icon>
+    </div>
+  </div>
+
+  <!-- Options Panel -->
+  @if (isOpen) {
+    <div class="dropdown-panel">
+      @for (option of options; track option.value) {
+        <div class="dropdown-option"
+          [class.selected]="isSelected(option)"
+          [class.placeholder-opt]="option.value === ''"
+          (click)="select(option)">
+          <span>{{ option.label }}</span>
+          @if (isSelected(option) && option.value !== '') {
+            <mat-icon class="check-icon">check</mat-icon>
+          }
+        </div>
+      }
+    </div>
+  }
+
+</div>

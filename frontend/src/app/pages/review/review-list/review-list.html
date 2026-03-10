@@ -1,0 +1,155 @@
+<div class="review-wrapper">
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <div>
+      <h1>Review Queue</h1>
+      <p class="breadcrumb">Home / <span>Review</span></p>
+    </div>
+    <div class="header-badges">
+      <span class="count-badge submitted">
+        <mat-icon>pending</mat-icon>
+        {{ submittedCount }} Pending
+      </span>
+      <span class="count-badge inreview">
+        <mat-icon>rate_review</mat-icon>
+        {{ inReviewCount }} In Review
+      </span>
+    </div>
+  </div>
+
+  <!-- Alerts -->
+  @if (successMessage) {
+    <div class="success-alert">
+      <mat-icon>check_circle</mat-icon>
+      {{ successMessage }}
+    </div>
+  }
+  @if (errorMessage) {
+    <div class="error-alert">
+      <mat-icon>error_outline</mat-icon>
+      {{ errorMessage }}
+    </div>
+  }
+
+  <!-- Filters -->
+  <div class="filters-card">
+    <div class="search-wrap">
+      <mat-icon>search</mat-icon>
+      <input [(ngModel)]="searchText"
+        placeholder="Search by title or requester..."/>
+    </div>
+
+    <div class="status-tabs">
+      <button [class.active]="filterStatus === 'all'"
+        (click)="filterStatus = 'all'">
+        All ({{ allRequests.length }})
+      </button>
+      <button [class.active]="filterStatus === 'submitted'"
+        (click)="filterStatus = 'submitted'">
+        Pending ({{ submittedCount }})
+      </button>
+      <button [class.active]="filterStatus === 'inreview'"
+        (click)="filterStatus = 'inreview'">
+        In Review ({{ inReviewCount }})
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  @if (isLoading) {
+    <div class="loading-center">
+      <mat-spinner diameter="40"/>
+      <p>Loading review queue...</p>
+    </div>
+  }
+
+  @if (!isLoading) {
+
+    <!-- Empty State -->
+    @if (filteredRequests.length === 0) {
+      <div class="empty-state">
+        <mat-icon>task_alt</mat-icon>
+        <h3>All caught up!</h3>
+        <p>No requests pending review</p>
+      </div>
+    }
+
+    <!-- Request Cards -->
+    <div class="review-grid">
+      @for (req of filteredRequests; track req.id) {
+        <div class="review-card" [ngClass]="getStatusClass(req.status)">
+
+          <!-- Card Header -->
+          <div class="card-header">
+            <div class="card-badges">
+              <span class="badge" [ngClass]="getStatusClass(req.status)">
+                {{ req.status === 'InReview' ? 'In Review' : req.status }}
+              </span>
+              <span class="priority" [ngClass]="getPriorityClass(req.priority)">
+                {{ req.priority }}
+              </span>
+            </div>
+            <span class="time-ago">{{ getTimeAgo(req.createdDate) }}</span>
+          </div>
+
+          <!-- Card Body -->
+          <h3 class="card-title">{{ req.title }}</h3>
+          <p class="card-category">
+            <mat-icon>category</mat-icon>
+            {{ req.category }}
+          </p>
+
+          <!-- Meta -->
+          <div class="card-meta">
+            <div class="meta-row">
+              <mat-icon>person</mat-icon>
+              <span>{{ req.createdByName }}</span>
+            </div>
+            <div class="meta-row">
+              <mat-icon>supervisor_account</mat-icon>
+              <span>{{ req.assignedReviewerName || 'Unassigned' }}</span>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="card-actions">
+            <a [routerLink]="['/requests', req.id]"
+              class="view-btn">
+              <mat-icon>visibility</mat-icon>
+              View Details
+            </a>
+
+            @if (req.status === 'Submitted') {
+              <button class="action-btn review-btn"
+                [disabled]="actionLoading[req.id]"
+                (click)="startReview(req)">
+                @if (actionLoading[req.id]) {
+                  <mat-spinner diameter="16"/>
+                } @else {
+                  <mat-icon>rate_review</mat-icon>
+                }
+                Start Review
+              </button>
+            }
+
+            @if (req.status === 'InReview') {
+              <button class="action-btn approve-btn"
+                [disabled]="actionLoading[req.id]"
+                (click)="approve(req)">
+                @if (actionLoading[req.id]) {
+                  <mat-spinner diameter="16"/>
+                } @else {
+                  <mat-icon>check_circle</mat-icon>
+                }
+                Approve
+              </button>
+            }
+          </div>
+
+        </div>
+      }
+    </div>
+  }
+
+</div>

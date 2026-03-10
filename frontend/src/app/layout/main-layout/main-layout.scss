@@ -1,0 +1,39 @@
+.layout-wrapper {
+  display: flex;
+  height: 100vh;          // ← was min-height
+  overflow: hidden;       // ← prevent double scrollbars
+  background: var(--bg-main);
+
+  app-sidebar {
+    align-self: stretch;  // ← sidebar stretches full height
+    display: flex;
+  }
+
+  .main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    transition: all 0.3s ease;
+    overflow: hidden;
+
+    .page-content {
+      flex: 1;
+      padding: 24px;
+      overflow-y: auto;   // ← only this scrolls, not the whole page
+
+      @media (max-width: 768px) {
+        padding: 16px;
+      }
+    }
+  }
+
+  // Overlay for mobile
+  .overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 99;
+    backdrop-filter: blur(2px);
+  }
+}

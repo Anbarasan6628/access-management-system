@@ -1,0 +1,62 @@
+<aside class="sidebar" [class.open]="isOpen">
+
+  <!-- Logo -->
+  <div class="sidebar-logo">
+    <div class="logo-icon">
+      <mat-icon>lock</mat-icon>
+    </div>
+    @if (isOpen) {
+      <div class="logo-text">
+        <h2>AMS</h2>
+        <span>Access Management</span>
+      </div>
+    }
+  </div>
+
+  <div class="sidebar-divider"></div>
+
+  <!-- Menu -->
+  <nav class="sidebar-nav">
+    <p class="nav-label">@if (isOpen) { MAIN MENU }</p>
+
+    @for (item of filteredMenu; track item.route) {
+      <div class="nav-item"
+        [class.active]="isActive(item.route)"
+        matRipple
+        (click)="navigate(item.route)">
+        <mat-icon>{{ item.icon }}</mat-icon>
+        @if (isOpen) {
+          <span>{{ item.label }}</span>
+          @if (item.badge) {
+            <span class="badge">{{ item.badge }}</span>
+          }
+        }
+      </div>
+    }
+  </nav>
+
+  <div class="sidebar-spacer"></div>
+  <div class="sidebar-divider"></div>
+
+  <!-- User Card + Logout -->
+  @if (isOpen) {
+    <div class="sidebar-user">
+      <div class="user-avatar">
+        {{ currentUser?.fullName?.charAt(0) }}
+      </div>
+      <div class="user-info">
+        <p class="user-name">{{ currentUser?.fullName }}</p>
+        <p class="user-role">{{ currentUser?.role }}</p>
+      </div>
+      <button class="logout-icon-btn" (click)="logout()" title="Logout">
+        <mat-icon>logout</mat-icon>
+      </button>
+    </div>
+  } @else {
+    <!-- Collapsed: just logout icon -->
+    <div class="nav-item logout" matRipple (click)="logout()">
+      <mat-icon>logout</mat-icon>
+    </div>
+  }
+
+</aside>
