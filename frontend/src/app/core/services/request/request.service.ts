@@ -3,12 +3,13 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ChangeRequest, CreateRequestDto, UpdateRequestDto, PagedResult } from '../../models/request.model';
 import { AuditLog } from '../../models/audit.model';  // ← ADD THIS IMPORT
+import { environment } from '../../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class RequestService {
   private http = inject(HttpClient);
-  private readonly API = 'https://localhost:44363/api/requests';
-  private readonly AUDIT_API = 'https://localhost:44363/api/audit'; // ← ADD THIS
+  private readonly API      = `${environment.apiUrl}/requests`;
+  private readonly AUDIT_API = `${environment.apiUrl}/audit`;
 
   // ── GET ALL PAGINATED ─────────────────
   getAll(pageNumber = 1, pageSize = 10): Observable<PagedResult<ChangeRequest>> {
