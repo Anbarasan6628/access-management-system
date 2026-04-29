@@ -1,5 +1,6 @@
 ﻿using AccessManagementSystem.Application.DTOs.Request;
 using AccessManagementSystem.Application.Interfaces;
+using AccessManagementSystem.Infrastructure.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -12,13 +13,17 @@ namespace AccessManagemntSystem.API.Controllers;
 public class RequestController : ControllerBase
 {
     private readonly IRequestService _requestService;
+    private readonly IAIService _aiService;
 
-    public RequestController(IRequestService requestService)
+    public RequestController(
+        IRequestService requestService,
+        IAIService aiService)
     {
         _requestService = requestService;
+        _aiService = aiService;
     }
 
-    // GET api/requests?pageNumber=1&pageSize=10
+    // GET api/requests
     [HttpGet]
     public async Task<IActionResult> GetAll(
         [FromQuery] int pageNumber = 1,
@@ -26,7 +31,8 @@ public class RequestController : ControllerBase
     {
         var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
         var role = User.FindFirstValue(ClaimTypes.Role)!;
-        var result = await _requestService.GetAllAsync(userId, role, pageNumber, pageSize);
+        var result = await _requestService.GetAllAsync(
+            userId, role, pageNumber, pageSize);
         return Ok(result);
     }
 
@@ -66,6 +72,16 @@ public class RequestController : ControllerBase
         var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
         await _requestService.SubmitAsync(id, userId);
         return Ok(new { message = "Request submitted successfully" });
+    }
+
+    // POST api/requests/{id}/review
+    [HttpPost("{id}/review")]
+    [Authorize(Roles = "Reviewer,Admin")]
+    public async Task<IActionResult> StartReview(int id)
+    {
+        var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        await _requestService.StartReviewAsync(id, userId);
+        return Ok(new { message = "Request is now In Review" });
     }
 
     // POST api/requests/{id}/approve
@@ -108,17 +124,6 @@ public class RequestController : ControllerBase
         return Ok(new { message = "Provisioning started" });
     }
 
-    // Add after Submit endpoint
-    // POST api/requests/{id}/review
-    [HttpPost("{id}/review")]
-    [Authorize(Roles = "Reviewer,Admin")]
-    public async Task<IActionResult> StartReview(int id)
-    {
-        var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-        await _requestService.StartReviewAsync(id, userId);
-        return Ok(new { message = "Request is now In Review" });
-    }
-
     // POST api/requests/{id}/close
     [HttpPost("{id}/close")]
     [Authorize(Roles = "Admin")]
@@ -128,4 +133,66 @@ public class RequestController : ControllerBase
         await _requestService.CloseAsync(id, userId);
         return Ok(new { message = "Request closed successfully" });
     }
+
+    // ── AI: Score risk (with cache + auto-approve) ────────────
+    [HttpPost("{id}/score-risk")]
+    [Authorize]
+    public async Task<IActionResult> ScoreRisk(int id)
+    {
+        var request = await _requestService.GetByIdAsync(id);
+        if (request == null)
+            return NotFound();
+
+        // ── Cache hit — return instantly from DB ──────
+        if (request.RiskScore.HasValue)
+        {
+            return Ok(new
+            {
+                score = request.RiskScore,
+                level = request.RiskLevel,
+                reason = request.RiskReason,
+                autoApprove = request.RiskScore <= 3,
+                fromCache = true
+            });
+        }
+
+        // ── Cache miss — call AI ──────────────────────
+        var result = await _aiService.ScoreRiskAsync(
+            request.Title,
+            request.Category.ToString(),
+            request.Priority.ToString(),
+            request.Description ?? string.Empty);
+
+        // ── Save to DB ────────────────────────────────
+        await _requestService.SaveRiskScoreAsync(
+            id,
+            result.Score,
+            result.Level,
+            result.Reason);
+
+        // ── Auto approve if score <= 3 ────────────────
+        if (result.AutoApprove)
+            await _requestService.AutoApproveAsync(id);
+
+        return Ok(result);
+    }
+
+    // ── AI: Suggest description ───────────────────────────────
+    [HttpPost("suggest-description")]
+    [Authorize]
+    public async Task<IActionResult> SuggestDescription(
+        [FromBody] SuggestDescriptionRequest body)
+    {
+        var result = await _aiService.SuggestDescriptionAsync(
+            body.Title,
+            body.Category);
+
+        return Ok(new { description = result });
+    }
 }
+
+public record SuggestDescriptionRequest(
+    string Title,
+    string Category);
+
+public record RejectRequestDto(string Reason);

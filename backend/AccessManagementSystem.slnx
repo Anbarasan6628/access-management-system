@@ -2,5 +2,5 @@
   <Project Path="AccessManagementSystem.Application/AccessManagementSystem.Application.csproj" />
   <Project Path="AccessManagementSystem.Domain/AccessManagementSystem.Domain.csproj" />
   <Project Path="AccessManagementSystem.Infrastructure/AccessManagementSystem.Infrastructure.csproj" />
-  <Project Path="AccessManagemntSystem.API/AccessManagemntSystem.API.csproj" />
+  <Project Path="AccessManagemntSystem.API/AccessManagementSystem.API.csproj" />
 </Solution>

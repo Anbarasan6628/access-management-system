@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\anbar\\Project\\AccessManagementSystem\\AccessManagementSystem\\AccessManagemntSystem.API\\AccessManagemntSystem.API.csproj": {}
+    "C:\\Users\\anbar\\Project\\access-management-system\\backend\\AccessManagemntSystem.API\\AccessManagemntSystem.API.csproj": {}
   },
   "projects": {
-    "C:\\Users\\anbar\\Project\\AccessManagementSystem\\AccessManagementSystem\\AccessManagementSystem.Application\\AccessManagementSystem.Application.csproj": {
+    "C:\\Users\\anbar\\Project\\access-management-system\\backend\\AccessManagementSystem.Application\\AccessManagementSystem.Application.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\anbar\\Project\\AccessManagementSystem\\AccessManagementSystem\\AccessManagementSystem.Application\\AccessManagementSystem.Application.csproj",
+        "projectUniqueName": "C:\\Users\\anbar\\Project\\access-management-system\\backend\\AccessManagementSystem.Application\\AccessManagementSystem.Application.csproj",
         "projectName": "AccessManagementSystem.Application",
-        "projectPath": "C:\\Users\\anbar\\Project\\AccessManagementSystem\\AccessManagementSystem\\AccessManagementSystem.Application\\AccessManagementSystem.Application.csproj",
+        "projectPath": "C:\\Users\\anbar\\Project\\access-management-system\\backend\\AccessManagementSystem.Application\\AccessManagementSystem.Application.csproj",
         "packagesPath": "C:\\Users\\anbar\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\anbar\\Project\\AccessManagementSystem\\AccessManagementSystem\\AccessManagementSystem.Application\\obj\\",
+        "outputPath": "C:\\Users\\anbar\\Project\\access-management-system\\backend\\AccessManagementSystem.Application\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -33,8 +33,8 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "C:\\Users\\anbar\\Project\\AccessManagementSystem\\AccessManagementSystem\\AccessManagementSystem.Domain\\AccessManagementSystem.Domain.csproj": {
-                "projectPath": "C:\\Users\\anbar\\Project\\AccessManagementSystem\\AccessManagementSystem\\AccessManagementSystem.Domain\\AccessManagementSystem.Domain.csproj"
+              "C:\\Users\\anbar\\Project\\access-management-system\\backend\\AccessManagementSystem.Domain\\AccessManagementSystem.Domain.csproj": {
+                "projectPath": "C:\\Users\\anbar\\Project\\access-management-system\\backend\\AccessManagementSystem.Domain\\AccessManagementSystem.Domain.csproj"
               }
             }
           }
@@ -49,7 +49,7 @@
           "auditLevel": "low",
           "auditMode": "direct"
         },
-        "SdkAnalysisLevel": "10.0.100"
+        "SdkAnalysisLevel": "10.0.200"
       },
       "frameworks": {
         "net8.0": {
@@ -73,18 +73,18 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.103/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.200/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "C:\\Users\\anbar\\Project\\AccessManagementSystem\\AccessManagementSystem\\AccessManagementSystem.Domain\\AccessManagementSystem.Domain.csproj": {
+    "C:\\Users\\anbar\\Project\\access-management-system\\backend\\AccessManagementSystem.Domain\\AccessManagementSystem.Domain.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\anbar\\Project\\AccessManagementSystem\\AccessManagementSystem\\AccessManagementSystem.Domain\\AccessManagementSystem.Domain.csproj",
+        "projectUniqueName": "C:\\Users\\anbar\\Project\\access-management-system\\backend\\AccessManagementSystem.Domain\\AccessManagementSystem.Domain.csproj",
         "projectName": "AccessManagementSystem.Domain",
-        "projectPath": "C:\\Users\\anbar\\Project\\AccessManagementSystem\\AccessManagementSystem\\AccessManagementSystem.Domain\\AccessManagementSystem.Domain.csproj",
+        "projectPath": "C:\\Users\\anbar\\Project\\access-management-system\\backend\\AccessManagementSystem.Domain\\AccessManagementSystem.Domain.csproj",
         "packagesPath": "C:\\Users\\anbar\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\anbar\\Project\\AccessManagementSystem\\AccessManagementSystem\\AccessManagementSystem.Domain\\obj\\",
+        "outputPath": "C:\\Users\\anbar\\Project\\access-management-system\\backend\\AccessManagementSystem.Domain\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -118,7 +118,7 @@
           "auditLevel": "low",
           "auditMode": "direct"
         },
-        "SdkAnalysisLevel": "10.0.100"
+        "SdkAnalysisLevel": "10.0.200"
       },
       "frameworks": {
         "net8.0": {
@@ -139,18 +139,18 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.103/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.200/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "C:\\Users\\anbar\\Project\\AccessManagementSystem\\AccessManagementSystem\\AccessManagementSystem.Infrastructure\\AccessManagementSystem.Infrastructure.csproj": {
+    "C:\\Users\\anbar\\Project\\access-management-system\\backend\\AccessManagementSystem.Infrastructure\\AccessManagementSystem.Infrastructure.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\anbar\\Project\\AccessManagementSystem\\AccessManagementSystem\\AccessManagementSystem.Infrastructure\\AccessManagementSystem.Infrastructure.csproj",
+        "projectUniqueName": "C:\\Users\\anbar\\Project\\access-management-system\\backend\\AccessManagementSystem.Infrastructure\\AccessManagementSystem.Infrastructure.csproj",
         "projectName": "AccessManagementSystem.Infrastructure",
-        "projectPath": "C:\\Users\\anbar\\Project\\AccessManagementSystem\\AccessManagementSystem\\AccessManagementSystem.Infrastructure\\AccessManagementSystem.Infrastructure.csproj",
+        "projectPath": "C:\\Users\\anbar\\Project\\access-management-system\\backend\\AccessManagementSystem.Infrastructure\\AccessManagementSystem.Infrastructure.csproj",
         "packagesPath": "C:\\Users\\anbar\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\anbar\\Project\\AccessManagementSystem\\AccessManagementSystem\\AccessManagementSystem.Infrastructure\\obj\\",
+        "outputPath": "C:\\Users\\anbar\\Project\\access-management-system\\backend\\AccessManagementSystem.Infrastructure\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -172,11 +172,11 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "C:\\Users\\anbar\\Project\\AccessManagementSystem\\AccessManagementSystem\\AccessManagementSystem.Application\\AccessManagementSystem.Application.csproj": {
-                "projectPath": "C:\\Users\\anbar\\Project\\AccessManagementSystem\\AccessManagementSystem\\AccessManagementSystem.Application\\AccessManagementSystem.Application.csproj"
+              "C:\\Users\\anbar\\Project\\access-management-system\\backend\\AccessManagementSystem.Application\\AccessManagementSystem.Application.csproj": {
+                "projectPath": "C:\\Users\\anbar\\Project\\access-management-system\\backend\\AccessManagementSystem.Application\\AccessManagementSystem.Application.csproj"
               },
-              "C:\\Users\\anbar\\Project\\AccessManagementSystem\\AccessManagementSystem\\AccessManagementSystem.Domain\\AccessManagementSystem.Domain.csproj": {
-                "projectPath": "C:\\Users\\anbar\\Project\\AccessManagementSystem\\AccessManagementSystem\\AccessManagementSystem.Domain\\AccessManagementSystem.Domain.csproj"
+              "C:\\Users\\anbar\\Project\\access-management-system\\backend\\AccessManagementSystem.Domain\\AccessManagementSystem.Domain.csproj": {
+                "projectPath": "C:\\Users\\anbar\\Project\\access-management-system\\backend\\AccessManagementSystem.Domain\\AccessManagementSystem.Domain.csproj"
               }
             }
           }
@@ -191,7 +191,7 @@
           "auditLevel": "low",
           "auditMode": "direct"
         },
-        "SdkAnalysisLevel": "10.0.100"
+        "SdkAnalysisLevel": "10.0.200"
       },
       "frameworks": {
         "net8.0": {
@@ -244,18 +244,18 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.103/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.200/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "C:\\Users\\anbar\\Project\\AccessManagementSystem\\AccessManagementSystem\\AccessManagemntSystem.API\\AccessManagemntSystem.API.csproj": {
+    "C:\\Users\\anbar\\Project\\access-management-system\\backend\\AccessManagemntSystem.API\\AccessManagemntSystem.API.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\anbar\\Project\\AccessManagementSystem\\AccessManagementSystem\\AccessManagemntSystem.API\\AccessManagemntSystem.API.csproj",
+        "projectUniqueName": "C:\\Users\\anbar\\Project\\access-management-system\\backend\\AccessManagemntSystem.API\\AccessManagemntSystem.API.csproj",
         "projectName": "AccessManagemntSystem.API",
-        "projectPath": "C:\\Users\\anbar\\Project\\AccessManagementSystem\\AccessManagementSystem\\AccessManagemntSystem.API\\AccessManagemntSystem.API.csproj",
+        "projectPath": "C:\\Users\\anbar\\Project\\access-management-system\\backend\\AccessManagemntSystem.API\\AccessManagemntSystem.API.csproj",
         "packagesPath": "C:\\Users\\anbar\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\anbar\\Project\\AccessManagementSystem\\AccessManagementSystem\\AccessManagemntSystem.API\\obj\\",
+        "outputPath": "C:\\Users\\anbar\\Project\\access-management-system\\backend\\AccessManagemntSystem.API\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -277,11 +277,11 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "C:\\Users\\anbar\\Project\\AccessManagementSystem\\AccessManagementSystem\\AccessManagementSystem.Application\\AccessManagementSystem.Application.csproj": {
-                "projectPath": "C:\\Users\\anbar\\Project\\AccessManagementSystem\\AccessManagementSystem\\AccessManagementSystem.Application\\AccessManagementSystem.Application.csproj"
+              "C:\\Users\\anbar\\Project\\access-management-system\\backend\\AccessManagementSystem.Application\\AccessManagementSystem.Application.csproj": {
+                "projectPath": "C:\\Users\\anbar\\Project\\access-management-system\\backend\\AccessManagementSystem.Application\\AccessManagementSystem.Application.csproj"
               },
-              "C:\\Users\\anbar\\Project\\AccessManagementSystem\\AccessManagementSystem\\AccessManagementSystem.Infrastructure\\AccessManagementSystem.Infrastructure.csproj": {
-                "projectPath": "C:\\Users\\anbar\\Project\\AccessManagementSystem\\AccessManagementSystem\\AccessManagementSystem.Infrastructure\\AccessManagementSystem.Infrastructure.csproj"
+              "C:\\Users\\anbar\\Project\\access-management-system\\backend\\AccessManagementSystem.Infrastructure\\AccessManagementSystem.Infrastructure.csproj": {
+                "projectPath": "C:\\Users\\anbar\\Project\\access-management-system\\backend\\AccessManagementSystem.Infrastructure\\AccessManagementSystem.Infrastructure.csproj"
               }
             }
           }
@@ -296,7 +296,7 @@
           "auditLevel": "low",
           "auditMode": "direct"
         },
-        "SdkAnalysisLevel": "10.0.100"
+        "SdkAnalysisLevel": "10.0.200"
       },
       "frameworks": {
         "net8.0": {
@@ -344,7 +344,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.103/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.200/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

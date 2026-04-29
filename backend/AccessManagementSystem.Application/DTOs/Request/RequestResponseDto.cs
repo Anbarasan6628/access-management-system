@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace AccessManagementSystem.Application.DTOs.Request;
+﻿namespace AccessManagementSystem.Application.DTOs.Request;
 
 public class RequestResponseDto
 {
@@ -20,4 +14,9 @@ public class RequestResponseDto
     public string CreatedByName { get; set; }
     public DateTime CreatedDate { get; set; }
     public DateTime UpdatedDate { get; set; }
+
+    // ── AI Risk Cache ──────────────────────────────
+    public int? RiskScore { get; set; }
+    public string? RiskLevel { get; set; }
+    public string? RiskReason { get; set; }
 }

@@ -17,7 +17,7 @@ namespace AccessManagementSystem.Infrastructure.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.24")
+                .HasAnnotation("ProductVersion", "8.0.11")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -98,6 +98,15 @@ namespace AccessManagementSystem.Infrastructure.Migrations
                         .HasColumnType("bit");
 
                     b.Property<int>("Priority")
+                        .HasColumnType("int");
+
+                    b.Property<string>("RiskLevel")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RiskReason")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("RiskScore")
                         .HasColumnType("int");
 
                     b.Property<int>("Status")

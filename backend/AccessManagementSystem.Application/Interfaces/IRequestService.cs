@@ -20,4 +20,8 @@ public interface IRequestService
     Task SendBackAsync(int id, int userId);
     Task ProvisionAsync(int id, int userId);
     Task CloseAsync(int id, int userId);
+
+    // AI Interface
+    Task SaveRiskScoreAsync(int id, int score, string level, string reason);
+    Task AutoApproveAsync(int id);
 }

@@ -20,10 +20,10 @@ public class RequestService : IRequestService
     }
 
     // ── CREATE ────────────────────────────────────────
-    public async Task<RequestResponseDto> CreateAsync(CreateRequestDto dto, int createdById)
+    public async Task<RequestResponseDto> CreateAsync(
+        CreateRequestDto dto, int createdById)
     {
         string? attachmentPath = null;
-
         if (dto.Attachment != null)
             attachmentPath = await _fileService.UploadFileAsync(dto.Attachment);
 
@@ -45,7 +45,8 @@ public class RequestService : IRequestService
     }
 
     // ── UPDATE ────────────────────────────────────────
-    public async Task<RequestResponseDto> UpdateAsync(int id, UpdateRequestDto dto, int userId)
+    public async Task<RequestResponseDto> UpdateAsync(
+        int id, UpdateRequestDto dto, int userId)
     {
         var request = await _context.ChangeRequests
             .FirstOrDefaultAsync(x => x.Id == id && x.CreatedById == userId);
@@ -60,8 +61,8 @@ public class RequestService : IRequestService
         {
             if (!string.IsNullOrEmpty(request.AttachmentPath))
                 _fileService.DeleteFile(request.AttachmentPath);
-
-            request.AttachmentPath = await _fileService.UploadFileAsync(dto.Attachment);
+            request.AttachmentPath =
+                await _fileService.UploadFileAsync(dto.Attachment);
         }
 
         request.Title = dto.Title;
@@ -90,19 +91,18 @@ public class RequestService : IRequestService
 
     // ── GET ALL (Paginated) ───────────────────────────
     public async Task<PagedResultDto<RequestResponseDto>> GetAllAsync(
-        int userId, string role, int pageNumber = 1, int pageSize = 10)
+        int userId, string role,
+        int pageNumber = 1, int pageSize = 10)
     {
         var query = _context.ChangeRequests
             .Include(x => x.CreatedBy)
             .Include(x => x.AssignedReviewer)
             .AsQueryable();
 
-        // Filter by role
         if (role == "Employee")
             query = query.Where(x => x.CreatedById == userId);
         else if (role == "Reviewer")
             query = query.Where(x => x.AssignedReviewerId == userId);
-        // Admin sees all
 
         var totalCount = await query.CountAsync();
 
@@ -121,47 +121,107 @@ public class RequestService : IRequestService
         };
     }
 
+    // ── SAVE RISK SCORE (cache) ───────────────────────  ← NEW
+    public async Task SaveRiskScoreAsync(
+        int id, int score, string level, string reason)
+    {
+        var request = await _context.ChangeRequests
+            .FirstOrDefaultAsync(x => x.Id == id);
+
+        if (request == null) return;
+
+        // save AI result to DB — next load reads from here
+        request.RiskScore = score;
+        request.RiskLevel = level;
+        request.RiskReason = reason;
+
+        await _context.SaveChangesAsync();
+    }
+
+    // ── AUTO APPROVE (called when score <= 3) ─────────  ← NEW
+    public async Task AutoApproveAsync(int id)
+    {
+        var request = await _context.ChangeRequests
+            .FirstOrDefaultAsync(x => x.Id == id);
+
+        if (request == null) return;
+
+        // only auto-approve Draft or Submitted requests
+        if (request.Status != RequestStatus.Draft &&
+            request.Status != RequestStatus.Submitted)
+            return;
+
+        var oldStatus = request.Status;
+        request.Status = RequestStatus.Approved;   // bypass ValidateTransition
+
+        _context.AuditLogs.Add(new AuditLog
+        {
+            RequestId = request.Id,
+            Action = "Auto-Approved by AI Risk Assessment",
+            OldStatus = oldStatus,
+            NewStatus = RequestStatus.Approved,
+            ChangedById = 1,
+            Remarks = $"AI Risk Score: {request.RiskScore}/10 — Low risk, auto-approved"
+        });
+
+        await _context.SaveChangesAsync();
+    }
+
     // ── STATE TRANSITIONS ─────────────────────────────
     public async Task SubmitAsync(int id, int userId)
     {
         var request = await GetRequestAsync(id);
         ValidateTransition(request.Status, RequestStatus.Submitted);
-        await ChangeStatusAsync(request, RequestStatus.Submitted, userId, "Submitted for review");
+        await ChangeStatusAsync(request, RequestStatus.Submitted,
+            userId, "Submitted for review");
+    }
+
+    public async Task StartReviewAsync(int id, int userId)
+    {
+        var request = await GetRequestAsync(id);
+        ValidateTransition(request.Status, RequestStatus.InReview);
+        await ChangeStatusAsync(request, RequestStatus.InReview,
+            userId, "Review started");
     }
 
     public async Task ApproveAsync(int id, int userId)
     {
         var request = await GetRequestAsync(id);
         ValidateTransition(request.Status, RequestStatus.Approved);
-        await ChangeStatusAsync(request, RequestStatus.Approved, userId, "Approved");
+        await ChangeStatusAsync(request, RequestStatus.Approved,
+            userId, "Approved");
     }
 
     public async Task RejectAsync(int id, int userId, string reason)
     {
         var request = await GetRequestAsync(id);
         ValidateTransition(request.Status, RequestStatus.Rejected);
-        await ChangeStatusAsync(request, RequestStatus.Rejected, userId, $"Rejected: {reason}");
+        await ChangeStatusAsync(request, RequestStatus.Rejected,
+            userId, $"Rejected: {reason}");
     }
 
     public async Task SendBackAsync(int id, int userId)
     {
         var request = await GetRequestAsync(id);
         ValidateTransition(request.Status, RequestStatus.Draft);
-        await ChangeStatusAsync(request, RequestStatus.Draft, userId, "Sent back to Draft");
+        await ChangeStatusAsync(request, RequestStatus.Draft,
+            userId, "Sent back to Draft");
     }
 
     public async Task ProvisionAsync(int id, int userId)
     {
         var request = await GetRequestAsync(id);
         ValidateTransition(request.Status, RequestStatus.Provisioning);
-        await ChangeStatusAsync(request, RequestStatus.Provisioning, userId, "Provisioning started");
+        await ChangeStatusAsync(request, RequestStatus.Provisioning,
+            userId, "Provisioning started");
     }
 
     public async Task CloseAsync(int id, int userId)
     {
         var request = await GetRequestAsync(id);
         ValidateTransition(request.Status, RequestStatus.Closed);
-        await ChangeStatusAsync(request, RequestStatus.Closed, userId, "Closed");
+        await ChangeStatusAsync(request, RequestStatus.Closed,
+            userId, "Closed");
     }
 
     // ── PRIVATE HELPERS ───────────────────────────────
@@ -176,20 +236,23 @@ public class RequestService : IRequestService
         return request;
     }
 
-    private void ValidateTransition(RequestStatus current, RequestStatus next)
+    private void ValidateTransition(
+        RequestStatus current, RequestStatus next)
     {
-        var validTransitions = new Dictionary<RequestStatus, List<RequestStatus>>
+        var valid = new Dictionary<RequestStatus, List<RequestStatus>>
         {
             { RequestStatus.Draft,        new() { RequestStatus.Submitted } },
             { RequestStatus.Submitted,    new() { RequestStatus.InReview } },
-            { RequestStatus.InReview,     new() { RequestStatus.Approved, RequestStatus.Rejected, RequestStatus.Draft } },
+            { RequestStatus.InReview,     new() { RequestStatus.Approved,
+                                                   RequestStatus.Rejected,
+                                                   RequestStatus.Draft } },
             { RequestStatus.Approved,     new() { RequestStatus.Provisioning } },
             { RequestStatus.Provisioning, new() { RequestStatus.Closed } },
         };
 
-        if (!validTransitions.ContainsKey(current) ||
-            !validTransitions[current].Contains(next))
-            throw new Exception($"Invalid transition from {current} to {next}");
+        if (!valid.ContainsKey(current) || !valid[current].Contains(next))
+            throw new Exception(
+                $"Invalid transition from {current} to {next}");
     }
 
     private async Task ChangeStatusAsync(
@@ -201,7 +264,7 @@ public class RequestService : IRequestService
         var oldStatus = request.Status;
         request.Status = newStatus;
 
-        var audit = new AuditLog
+        _context.AuditLogs.Add(new AuditLog
         {
             RequestId = request.Id,
             Action = action,
@@ -209,20 +272,12 @@ public class RequestService : IRequestService
             NewStatus = newStatus,
             ChangedById = userId,
             Remarks = action
-        };
+        });
 
-        _context.AuditLogs.Add(audit);
         await _context.SaveChangesAsync();
     }
 
-    // Add after SubmitAsync method
-    public async Task StartReviewAsync(int id, int userId)
-    {
-        var request = await GetRequestAsync(id);
-        ValidateTransition(request.Status, RequestStatus.InReview);
-        await ChangeStatusAsync(request, RequestStatus.InReview, userId, "Review started");
-    }
-
+    // ── MAP TO DTO ────────────────────────────────────
     private RequestResponseDto MapToDto(ChangeRequest request)
     {
         return new RequestResponseDto
@@ -240,7 +295,12 @@ public class RequestService : IRequestService
             AssignedReviewerName = request.AssignedReviewer?.FullName ?? "",
             CreatedByName = request.CreatedBy?.FullName ?? "",
             CreatedDate = request.CreatedDate,
-            UpdatedDate = request.UpdatedDate
+            UpdatedDate = request.UpdatedDate,
+
+            // ── AI cache fields ──────────────────────  ← NEW
+            RiskScore = request.RiskScore,
+            RiskLevel = request.RiskLevel,
+            RiskReason = request.RiskReason
         };
     }
 }

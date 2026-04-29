@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "Ugx7CT88vmk=",
+  "dgSpecHash": "tHm5AV3ZOEA=",
   "success": true,
-  "projectFilePath": "C:\\Users\\anbar\\Project\\AccessManagementSystem\\AccessManagementSystem\\AccessManagementSystem.Domain\\AccessManagementSystem.Domain.csproj",
+  "projectFilePath": "C:\\Users\\anbar\\Project\\access-management-system\\backend\\AccessManagementSystem.Domain\\AccessManagementSystem.Domain.csproj",
   "expectedPackageFiles": [],
   "logs": []
 }
