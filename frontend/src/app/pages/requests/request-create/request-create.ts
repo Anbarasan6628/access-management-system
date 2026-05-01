@@ -7,6 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { RequestService } from '../../../core/services/request/request.service';
 import { UserService } from '../../../core/services/user/user.service';
+import { AiService } from '../../../core/services/ai/ai.service';
 import { User } from '../../../core/models/user.model';
 import { Dropdown, DropdownOption } from '../../../shared/components/dropdown/dropdown';
 
@@ -29,6 +30,7 @@ export class RequestCreate implements OnInit {
   private fb             = inject(FormBuilder);
   private requestService = inject(RequestService);
   private userService    = inject(UserService);
+  private aiService      = inject(AiService);
   private router         = inject(Router);
 
   form: FormGroup = this.fb.group({
@@ -39,16 +41,15 @@ export class RequestCreate implements OnInit {
     assignedReviewerId: ['', Validators.required],
   });
 
-  reviewers:      User[]           = [];
+  reviewers:       User[]           = [];
   reviewerOptions: DropdownOption[] = [];
-  selectedFile:   File | null      = null;
-  fileName        = '';
-  isLoading       = false;
-  isLoadingUsers  = true;
-  errorMessage    = '';
-  successMessage  = '';
+  selectedFile:    File | null      = null;
+  fileName         = '';
+  isLoading        = false;
+  isLoadingUsers   = true;
+  isAiLoading      = false;
+  errorMessage     = '';
 
-  // ← values must be STRING for DropdownOption
   categories: DropdownOption[] = [
     { value: '0', label: 'Access Change' },
     { value: '1', label: 'Deployment' },
@@ -69,7 +70,7 @@ export class RequestCreate implements OnInit {
     this.isLoadingUsers = true;
     this.userService.getReviewers().subscribe({
       next: (users) => {
-        this.reviewers      = users;
+        this.reviewers       = users;
         this.reviewerOptions = users.map(u => ({
           value: String(u.id),
           label: `${u.fullName} — ${u.role}`
@@ -79,6 +80,27 @@ export class RequestCreate implements OnInit {
       error: (err) => {
         console.error('Error loading reviewers:', err);
         this.isLoadingUsers = false;
+      }
+    });
+  }
+
+  // ── AI: Suggest description ───────────────────────────────
+  suggestDescription() {
+    const t = this.title.value;
+    const c = this.category.value;
+    if (!t || !c) return;
+
+    this.isAiLoading  = true;
+    this.errorMessage = '';
+
+    this.aiService.suggestDescription(t, c).subscribe({
+      next: (res) => {
+        this.form.patchValue({ description: res.description });
+        this.isAiLoading = false;
+      },
+      error: () => {
+        this.errorMessage = 'AI suggestion failed. Please try again.';
+        this.isAiLoading  = false;
       }
     });
   }
@@ -115,30 +137,40 @@ export class RequestCreate implements OnInit {
   }
 
   onSubmit() {
-    if (this.form.invalid) {
-      this.form.markAllAsTouched();
-      return;
-    }
-
-    this.isLoading    = true;
-    this.errorMessage = '';
-
-    const dto = {
-      ...this.form.value,
-      attachment: this.selectedFile
-    };
-
-    this.requestService.create(dto).subscribe({
-      next: (created) => {
-        this.isLoading = false;
-        this.router.navigate(['/requests', created.id]);
-      },
-      error: (err) => {
-        this.isLoading    = false;
-        this.errorMessage = err.error?.message || 'Failed to create request';
-      }
-    });
+  if (this.form.invalid) {
+    this.form.markAllAsTouched();
+    return;
   }
+
+  this.isLoading    = true;
+  this.errorMessage = '';
+
+  const dto = {
+    ...this.form.value,
+    attachment: this.selectedFile
+  };
+
+  this.requestService.create(dto).subscribe({
+    next: (created) => {
+      // ── Auto score risk after create ──────────────
+      this.aiService.scoreRisk(created.id).subscribe({
+        next: () => {
+          this.isLoading = false;
+          this.router.navigate(['/requests', created.id]);
+        },
+        error: () => {
+          // Don't block navigation if AI fails
+          this.isLoading = false;
+          this.router.navigate(['/requests', created.id]);
+        }
+      });
+    },
+    error: (err) => {
+      this.isLoading    = false;
+      this.errorMessage = err.error?.message || 'Failed to create request';
+    }
+  });
+}
 
   get title()              { return this.form.get('title')!; }
   get description()        { return this.form.get('description')!; }

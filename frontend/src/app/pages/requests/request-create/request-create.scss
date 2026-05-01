@@ -21,6 +21,15 @@
     }
   }
 
+  .label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+
+  label { margin-bottom: 0; }
+}
+
   .form-card {
     background: white;
     border-radius: var(--radius);

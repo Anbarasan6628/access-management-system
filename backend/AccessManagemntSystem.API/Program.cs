@@ -32,22 +32,54 @@ builder.Services.AddScoped<IAuditService, AuditService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IUserService, UserService>();
 
-// ✅ FIX 1: Ollama only runs in Development (not on Azure)
-if (builder.Environment.IsDevelopment())
+// ── AI Service (Ollama locally → Groq fallback) ──────────────
+var groqApiKey = builder.Configuration["Groq:ApiKey"]!;
+var groqModelId = builder.Configuration["Groq:ModelId"]
+                  ?? "llama-3.3-70b-versatile";
+
+builder.Services.AddSingleton<Kernel>(_ =>
 {
-    builder.Services.AddSingleton<Kernel>(sp =>
-        Kernel.CreateBuilder()
-              .AddOllamaChatCompletion(
-                  modelId: "phi3.5",
-                  endpoint: new Uri("http://localhost:11434"))
-              .Build());
-    builder.Services.AddScoped<IAIService, AIService>();
-}
-else
-{
-    // Production: register a no-op AI service so the app doesn't crash
-    builder.Services.AddScoped<IAIService, NoOpAIService>();
-}
+    bool ollamaRunning = false;
+
+    if (builder.Environment.IsDevelopment())
+    {
+        try
+        {
+            using var http = new HttpClient { Timeout = TimeSpan.FromSeconds(2) };
+            var result = http.GetAsync("http://localhost:11434").Result;
+            ollamaRunning = result.IsSuccessStatusCode;
+        }
+        catch
+        {
+            ollamaRunning = false;
+        }
+    }
+
+    if (ollamaRunning)
+    {
+        Console.WriteLine("✅ AI: Using Ollama (local)");
+        return Kernel.CreateBuilder()
+                     .AddOllamaChatCompletion(
+                         modelId: "phi3.5",
+                         endpoint: new Uri("http://localhost:11434"))
+                     .Build();
+    }
+    else
+    {
+        Console.WriteLine("✅ AI: Using Groq (fallback)");
+        return Kernel.CreateBuilder()
+                     .AddOpenAIChatCompletion(
+                         modelId: groqModelId,
+                         apiKey: groqApiKey,
+                         httpClient: new HttpClient
+                         {
+                             BaseAddress = new Uri("https://api.groq.com/openai/v1/")
+                         })
+                     .Build();
+    }
+});
+
+builder.Services.AddScoped<IAIService, AIService>();
 
 // ✅ FIX 2: CORS reads allowed origins from config (supports both local + Azure)
 var allowedOrigins = builder.Configuration

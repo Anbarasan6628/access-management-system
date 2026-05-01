@@ -50,28 +50,8 @@
         }
       </div>
 
-      <!-- Description -->
-      <div class="form-group">
-        <label>Description <span class="required">*</span></label>
-        <div class="input-wrap">
-          <mat-icon class="input-icon top-icon">description</mat-icon>
-          <textarea class="custom-input custom-textarea"
-            formControlName="description"
-            placeholder="Describe the change request in detail"
-            rows="4">
-          </textarea>
-        </div>
-        @if (description.hasError('required') && description.touched) {
-          <span class="error-msg">Description is required</span>
-        }
-        @if (description.hasError('minlength') && description.touched) {
-          <span class="error-msg">Minimum 10 characters required</span>
-        }
-      </div>
-
       <!-- Category + Priority -->
       <div class="two-col-row">
-
         <div class="form-group">
           <label>Category <span class="required">*</span></label>
           <app-dropdown
@@ -97,7 +77,38 @@
             <span class="error-msg">Priority is required</span>
           }
         </div>
+      </div>
 
+      <!-- Description -->
+      <div class="form-group">
+        <div class="label-row">
+          <label>Description <span class="required">*</span></label>
+          <button type="button" class="action-btn action-btn-info"
+            (click)="suggestDescription()"
+            [disabled]="!title.value || !category.value || isAiLoading">
+            @if (isAiLoading) {
+              <mat-spinner diameter="14"></mat-spinner>
+              <span>Generating...</span>
+            } @else {
+              <mat-icon>auto_awesome</mat-icon>
+              <span>AI Suggest</span>
+            }
+          </button>
+        </div>
+        <div class="input-wrap">
+          <mat-icon class="input-icon top-icon">description</mat-icon>
+          <textarea class="custom-input custom-textarea"
+            formControlName="description"
+            placeholder="Describe the change request in detail, or use AI Suggest above"
+            rows="4">
+          </textarea>
+        </div>
+        @if (description.hasError('required') && description.touched) {
+          <span class="error-msg">Description is required</span>
+        }
+        @if (description.hasError('minlength') && description.touched) {
+          <span class="error-msg">Minimum 10 characters required</span>
+        }
       </div>
 
       <!-- Assign Reviewer -->
@@ -145,7 +156,7 @@
         <button class="btn-save" type="submit"
           [disabled]="form.invalid || isLoading">
           @if (isLoading) {
-            <mat-spinner diameter="18"/>
+            <mat-spinner diameter="18"></mat-spinner>
             <span>Creating...</span>
           } @else {
             <mat-icon>send</mat-icon>
